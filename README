@@ -1,0 +1,7 @@
+Script to automate patch level upgrades on 2.11BSD.
+
+Warning!!!
+Running this script may result in data lost.
+Backup everything, read carefully and ammend when needed.
+
+Tested on PIDP11 2.11BSD released image on top of Simh
