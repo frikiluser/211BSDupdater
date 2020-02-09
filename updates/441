@@ -1,0 +1,46 @@
+#!/bin/sh
+
+PATCH=441
+ARTIFACT_LINES=448
+ARTIFACT_NAME=$PATCH
+
+## Verify artifact
+wc -l /tmp/$PATCH.artifact | \
+    grep -c "\ $ARTIFACT_LINES\ /tmp/" || \
+    exit 1
+
+## Rename artifact
+mv /tmp/$PATCH.artifact /tmp/$ARTIFACT_NAME
+
+## Fix
+cd /tmp
+sh $ARTIFACT_NAME
+./$PATCH.sh
+sh $PATCH.shar
+patch -p0 < $PATCH.patch
+
+cd /usr/src/usr.lib/libvmf
+make
+make install
+make clean
+
+cd /usr/src/lib/cpp
+make 
+make install
+make clean
+
+cd /usr/src/bin/ld
+make
+make install
+make clean
+
+cd /usr/src/man/man1
+/usr/man/manroff mkstr.1 > /usr/man/cat1/mkstr.0
+
+cd ../man3
+/usr/man/manroff creat.3 > /usr/man/cat3/creat.0
+
+cd /sys/mdec
+make
+make install
+make clean

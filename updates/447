@@ -1,0 +1,48 @@
+#!/bin/sh
+
+PATCH=447
+ARTIFACT_LINES=944
+ARTIFACT_NAME=$PATCH
+
+## Verify artifact
+wc -l /tmp/$PATCH.artifact | \
+    grep -c "\ $ARTIFACT_LINES\ /tmp/" || \
+    exit 1
+
+## Rename artifact
+mv /tmp/$PATCH.artifact /tmp/$ARTIFACT_NAME
+
+## Fix
+cd /
+patch -p0 < /tmp/$ARTIFACT_NAME
+rm /tmp/$ARTIFACT_NAME
+
+cd /usr/src/bin/tcsh
+make clean
+make
+make install
+
+cd /usr/src/bin
+rm -f ps
+make ps
+install -g kmem -m 2751 -s ps /bin/ps
+
+cd /usr/src/ucb/man
+make clean
+make
+make install
+
+cd /usr/src/ucb
+rm -f vmstat
+make vmstat
+install -g kmem -m 2755 -s vmstat /usr/ucb/vmstat
+
+cd /usr/src/man/man1
+rm -f vmstat.0
+make vmstat.0
+install -c -o bin -g bin -m 444 vmstat.0 /usr/man/cat1
+
+cd  /usr/src/usr.sbin/pstat
+make clean
+make
+make install

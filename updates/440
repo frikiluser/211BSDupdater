@@ -1,0 +1,28 @@
+#!/bin/sh
+
+PATCH=440
+ARTIFACT_LINES=572
+ARTIFACT_NAME=$PATCH
+
+## Verify artifact
+wc -l /tmp/$PATCH.artifact | \
+    grep -c "\ $ARTIFACT_LINES\ /tmp/" || \
+    exit 1
+
+## Rename artifact
+mv /tmp/$PATCH.artifact /tmp/$ARTIFACT_NAME
+
+## Fix
+cd /tmp
+sh $ARTIFACT_NAME
+cp m11.x /usr/src/new/m11
+patch -p0 < $PATCH.patch
+
+cd /usr/src/new/l11
+make install
+make clean
+
+cd /usr/src/new/m11
+rm -f l11.x
+make install
+make clean

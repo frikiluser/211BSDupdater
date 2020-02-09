@@ -1,0 +1,44 @@
+#!/bin/sh
+
+PATCH=446
+ARTIFACT_LINES=413
+ARTIFACT_NAME=$PATCH
+
+## Verify artifact
+wc -l /tmp/$PATCH.artifact | \
+    grep -c "\ $ARTIFACT_LINES\ /tmp/" || \
+    exit 1
+
+## Rename artifact
+mv /tmp/$PATCH.artifact /tmp/$ARTIFACT_NAME
+
+## Fix
+cd /
+patch -p0 < /tmp/$ARTIFACT_NAME
+rm /tmp/$ARTIFACT_NAME
+
+cd /usr/src/lib/libkern
+make clean
+make
+make install
+make clean
+
+cd /sys/pdpstand
+make clean
+make
+cp boot disklabel toyset /
+
+cd /usr/src/sys/autoconfig
+make clean
+make
+make install
+make clean
+
+cd /usr/src/sbin/umount
+make 
+make install
+make clean
+
+cd /usr/src/bin
+make tar
+install -s -m 751 -g staff tar /bin
