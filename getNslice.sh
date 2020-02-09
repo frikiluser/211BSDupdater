@@ -23,14 +23,11 @@ fi
 ## Slice
 
 case "$PATCH" in
-    432)
-        sed -e '1,/.====cut here===.*/ d' < ./patches/$PATCH > /tmp/$PATCH.artifact
-        ;;
     448)
         sed -e '1,/pdp is alive.*/ d' < ./patches/$PATCH > /tmp/$PATCH.artifact
         ;;
-    default)
-        sed -e '1,/.*---.*cut here---.*/ d' < ./patches/$PATCH > /tmp/$PATCH.artifact
+    *)
+        sed -e '1,/.*[-|=].*[c|C]ut here.*[-|=].*/ d' < ./patches/$PATCH > /tmp/$PATCH.artifact
         ;;
 esac
 
