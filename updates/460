@@ -1,0 +1,59 @@
+#!/bin/sh
+
+PATCH=460
+ARTIFACT_LINES=9567
+ARTIFACT_NAME=$PATCH.shar
+
+## Verify artifact
+wc -l /tmp/$PATCH.artifact | \
+    grep -c "\ $ARTIFACT_LINES\ /tmp/" || \
+    exit 1
+
+## Rename artifact
+mv /tmp/$PATCH.artifact /tmp/$ARTIFACT_NAME
+
+## Fix
+cd /tmp
+# unpack the shar archive
+sh $PATCH.shar
+
+# uudecode (uuencoded because the file is binary data) the CPP tar file
+uudecode cpp.tar.Z.uu
+
+# uncompress the CPP tar file
+uncompress cpp.tar.Z
+
+# Patch, build and install the C compiler backend
+cd /
+patch -p0 < /tmp/ccom.patch
+cd usr/src/lib/ccom
+make
+make install
+
+# build and install the C compiler frontend
+cd /usr/src/bin
+make cc
+mv /bin/cc /bin/cc.old
+install -m 755 -o root -g wheel -s cc /bin
+
+# Now save the old CPP, unpack thew CPP tar archive, build and install new CPP
+cd /
+mv usr/src/lib/cpp usr/src/lib/cpp.old
+tar xf /tmp/cpp.tar
+cd usr/src/lib/cpp
+make
+mv /lib/cpp /lib/cpp.old
+make install
+
+# Patch the sources which have been updated for ANSI processing rules
+cd /
+patch -p0 < /tmp/src.patch
+
+# Cleanup  if desired.
+cd /tmp
+rm cpp.tar cpp.tar.Z.uu ccom.patch src.patch
+
+# More cleanup
+# find / -name '*~' -print > /tmp/tilde
+# rm `cat /tmp/tilde`
+# rm /usr/src/lib/cpp.old /bin/cc.old
