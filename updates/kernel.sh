@@ -1,5 +1,18 @@
 #!/bin/sh
 
+if [ "$1" = "" ]
+then
+    touch /tmp/updater.hook.kernel
+    exit 0
+fi
+
+if [ ! -e /tmp/updater.hook.kernel ]
+then
+    exit 0
+fi
+
+rm -f /tmp/updater.hook.kernel
+
 # FIXME: YMMV
 SYSTEM=PIDP11
 

@@ -12,3 +12,5 @@ do
     CURRENT=`grep "Current Patch Level:" /VERSION | head -1 | awk '{print $4}'`
     PATCH=`echo $CURRENT+1|bc`
 done
+
+sh ./updates/kernel.sh
