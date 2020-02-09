@@ -21,7 +21,13 @@ EOF
 fi
 
 ## Slice
-sed -e '1,/.*---cut here---.*/ d' < ./patches/$PATCH > /tmp/$PATCH.artifact
+
+if [ $PATCH -eq 448 ]
+then
+    sed -e '1,/pdp is alive.*/ d' < ./patches/$PATCH > /tmp/$PATCH.artifact
+else
+    sed -e '1,/.*---cut here---.*/ d' < ./patches/$PATCH > /tmp/$PATCH.artifact
+fi
 
 ## Clean
 #rm ./patches/$PATCH
