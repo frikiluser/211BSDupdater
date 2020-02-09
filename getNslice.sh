@@ -23,7 +23,7 @@ fi
 ## Slice
 
 case "$PATCH" in
-    1)
+    1|2|3)
         cat ./patches/$PATCH > /tmp/$PATCH.artifact
         ;;
     100)
@@ -41,6 +41,11 @@ case "$PATCH" in
         if [ "$?" != "0" ]
         then
             sed -e '1,/^======/ d' < ./patches/$PATCH > /tmp/$PATCH.artifact
+        fi
+        grep -c '' /tmp/$PATCH.artifact > /dev/null
+        if [ "$?" != "0" ]
+        then
+            sed -e '1,/\*\*\*/ d' < ./patches/$PATCH > /tmp/$PATCH.artifact
         fi
         ;;
 esac
