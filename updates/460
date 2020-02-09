@@ -42,7 +42,7 @@ mv usr/src/lib/cpp usr/src/lib/cpp.old
 tar xf /tmp/cpp.tar
 cd usr/src/lib/cpp
 make
-mv /lib/cpp /lib/cpp.old
+cp /lib/cpp /lib/cpp.old
 make install
 
 # Patch the sources which have been updated for ANSI processing rules
