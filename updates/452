@@ -14,13 +14,13 @@ mv /tmp/$PATCH.artifact /tmp/$ARTIFACT_NAME
 
 ## Fix
 cd /tmp
-sh $ARTIFACT_NAME
-patch -p0 < /tmp/$PATCH-diffs
+sed 's///g' $ARTIFACT_NAME > $ARTIFACT_NAME.fixed
+sh $ARTIFACT_NAME.fixed
 
 sh /tmp/$PATCH-rm
 
 cd /
-patch -p0 < /tmp/$PATCH-patch
+patch -p0 < /tmp/$PATCH-diffs
 
 #
 cd /usr/src/lib/libc/gen
