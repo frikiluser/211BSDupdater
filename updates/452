@@ -1,0 +1,83 @@
+#!/bin/sh
+
+PATCH=452
+ARTIFACT_LINES=1626
+ARTIFACT_NAME=$PATCH
+
+## Verify artifact
+wc -l /tmp/$PATCH.artifact | \
+    grep -c "\ $ARTIFACT_LINES\ /tmp/" || \
+    exit 1
+
+## Rename artifact
+mv /tmp/$PATCH.artifact /tmp/$ARTIFACT_NAME
+
+## Fix
+cd /tmp
+sh $ARTIFACT_NAME
+patch -p0 < /tmp/$PATCH-diffs
+
+sh /tmp/$PATCH-rm
+
+cd /
+patch -p0 < /tmp/$PATCH-patch
+
+#
+cd /usr/src/lib/libc/gen
+cc -p -O -c random.c
+ld -X -r random.o
+mv a.out profiled/random.o
+cc -O -c random.c
+ld -X -r random.o
+mv a.out random.o
+ar rv /lib/libc.a random.o
+ranlib /lib/libc.a
+ar rv /usr/lib/libc_p.a profiled/random.o
+ranlib /usr/lib/libc_p.a
+
+#
+cd /usr/src/man/man3
+make random.0
+install -c -o bin -g bin -m 444 random.0 /usr/man/cat3/random.0
+rm -f /usr/man/cat3/initstate.0 /usr/man/cat3/setstate.0 /usr/man/cat3/srandom.0
+ln /usr/man/cat3/random.0 /usr/man/cat3/initstate.0
+ln /usr/man/cat3/random.0 /usr/man/cat3/setstate.0
+ln /usr/man/cat3/random.0 /usr/man/cat3/srandom.0
+make clean
+
+#
+cd /usr/src/usr.lib/libF77
+make
+make install
+make clean
+
+#
+cd /usr/src/share/lint
+make
+make install
+make clean
+
+#
+cd /usr/src/games/fortune
+make
+make install
+make clean
+
+cd /usr/src/games/backgammon
+make
+make install
+make clean
+
+cd /usr/src/games/mille
+make
+make install
+make clean
+
+cd /usr/src/bin/passwd
+make
+make install
+
+cd /usr/src/libexec/identd
+make
+make install
+make clean

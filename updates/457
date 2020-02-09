@@ -1,0 +1,45 @@
+#!/bin/sh
+
+PATCH=457
+ARTIFACT_LINES=437
+ARTIFACT_NAME=$PATCH.txt
+
+## Verify artifact
+wc -l /tmp/$PATCH.artifact | \
+    grep -c "\ $ARTIFACT_LINES\ /tmp/" || \
+    exit 1
+
+## Rename artifact
+mv /tmp/$PATCH.artifact /tmp/$ARTIFACT_NAME
+
+## Fix
+cd /
+patch -p0 < /tmp/$ARTIFACT_NAME
+
+strip /usr/share/pascal/npx_header
+
+cd /usr/src/bin/csh
+make
+make install
+make clean
+
+cd /usr/src/bin/tcsh
+make
+make install
+make clean
+
+cd /usr/src/share/zoneinfo
+make
+make install
+make clean
+
+cd /usr/src/usr.sbin/rwhod
+make
+make install
+make clean
+# if you are running rwhod you may want to kill and re-start it
+
+cd /usr/src/man/man1
+make mkstr.0
+install -c -o bin -g bin -m 444 mkstr.0 /usr/man/cat1
+make clean

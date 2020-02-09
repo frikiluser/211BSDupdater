@@ -1,0 +1,38 @@
+#!/bin/sh
+
+PATCH=454
+ARTIFACT_LINES=585
+ARTIFACT_NAME=$PATCH.patch
+
+## Verify artifact
+wc -l /tmp/$PATCH.artifact | \
+    grep -c "\ $ARTIFACT_LINES\ /tmp/" || \
+    exit 1
+
+## Rename artifact
+mv /tmp/$PATCH.artifact /tmp/$ARTIFACT_NAME
+
+## Fix
+cd /
+patch -p0 < /tmp/$ARTIFACT_NAME
+
+cd /usr/src/lib/libc/gen
+make ctime.o
+ar rv /lib/libc.a ctime.o
+ranlib /lib/libc.a
+cd profiled
+ar rv /usr/lib/libc_p.a ctime.o
+ranlib /usr/lib/libc_p.a
+cd ..
+make clean
+
+cd /usr/src/man/man1
+make date.0
+/usr/man/manroff date.1 > date.0
+install -c -o bin -g bin -m 444 date.0 /usr/man/cat1
+make clean
+
+cd /usr/src/bin
+make date
+install -s -m 751 -g staff date /bin/date
+make clean

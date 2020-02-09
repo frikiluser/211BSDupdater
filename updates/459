@@ -1,0 +1,30 @@
+#!/bin/sh
+
+PATCH=459
+ARTIFACT_LINES=770
+ARTIFACT_NAME=$PATCH
+
+## Verify artifact
+wc -l /tmp/$PATCH.artifact | \
+    grep -c "\ $ARTIFACT_LINES\ /tmp/" || \
+    exit 1
+
+## Rename artifact
+mv /tmp/$PATCH.artifact /tmp/$ARTIFACT_NAME
+
+## Fix
+cd /tmp
+sh  $ARTIFACT_NAME
+patch -p0 < $PATCH.patch
+install -c -m 444 -o root -g wheel stdarg.h /usr/include
+
+# remove the symlink
+rm /usr/include/vaxuba
+# remove the directory
+rm -r /usr/include/sys/vaxuba
+
+# remove the asm.sed files
+rm /usr/src/asm.sed*
+
+# remove the unmaintained/outdated copy of include files in the source tree
+rm -r /usr/src/include
