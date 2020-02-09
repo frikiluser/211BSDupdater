@@ -1,0 +1,36 @@
+#!/bin/sh
+
+PATCH=451
+ARTIFACT_LINES=127
+ARTIFACT_NAME=$PATCH
+
+## Verify artifact
+wc -l /tmp/$PATCH.artifact | \
+    grep -c "\ $ARTIFACT_LINES\ /tmp/" || \
+    exit 1
+
+## Rename artifact
+mv /tmp/$PATCH.artifact /tmp/$ARTIFACT_NAME
+
+## Fix
+cd /
+patch -p0 < /tmp/$ARTIFACT_NAME
+rm /tmp/$ARTIFACT_NAME
+
+# Atention YMMV
+cd /sys/PIDP11
+make
+# optionally save the old kernel and networking
+mv /unix /ounix
+mv /netnix /onetnix
+install -c -o root -g wheel -m 744 unix /unix
+install -c -o root -g wheel -m 744 netnix /netnix
+make clean
+
+# optional
+cd /sys/GENERIC
+make
+install -c -o root -g wheel -m 744 unix /genunix
+make clean
+
+# reboot
