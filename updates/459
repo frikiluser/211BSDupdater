@@ -20,12 +20,13 @@ patch -p0 < /tmp/$PATCH.patch
 install -c -m 444 -o root -g wheel /tmp/stdarg.h /usr/include
 
 # remove the symlink
-rm /usr/include/vaxuba
+rm -f /usr/include/vaxuba
 # remove the directory
 rm -r /usr/include/sys/vaxuba
 
 # remove the asm.sed files
-rm /usr/src/asm.sed*
+touch /usr/src/asm.sed0
+rm -f /usr/src/asm.sed*
 
 # remove the unmaintained/outdated copy of include files in the source tree
-rm -r /usr/src/include
+rm -rf /usr/src/include
