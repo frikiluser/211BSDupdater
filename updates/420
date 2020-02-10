@@ -13,4 +13,4 @@ wc -l /tmp/$PATCH.artifact | \
 mv /tmp/$PATCH.artifact /tmp/$ARTIFACT_NAME
 
 ## Fix
-cd / ; patch -p0 < /tmp/$ARTIFACT_NAME ; rm /tmp/$ARTIFACT_NAME
+sed -i 's@Current Patch Level: 419@Current Patch Level: 420@' /VERSION
