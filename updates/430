@@ -1,7 +1,7 @@
 #!/bin/sh
 
-PATCH=438
-ARTIFACT_LINES=229
+PATCH=430
+ARTIFACT_LINES=1325
 ARTIFACT_NAME=$PATCH
 
 ## Verify artifact
@@ -13,7 +13,14 @@ wc -l /tmp/$PATCH.artifact | \
 mv /tmp/$PATCH.artifact /tmp/$ARTIFACT_NAME
 
 ## Fix
-cd / ; patch -p0 < /tmp/$ARTIFACT_NAME ; rm /tmp/$ARTIFACT_NAME
+cd /
+patch -p0 < /tmp/$ARTIFACT_NAME
+mount -u -o noaccesstime /usr
+cd /usr/src
+make clean
 
-# Rebuild and install kernel
-sh ./updates/kernel.sh
+make build >& /usr/tmp/log
+make installsrc
+
+cd /usr/src
+make clean

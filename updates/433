@@ -14,3 +14,11 @@ mv /tmp/$PATCH.artifact /tmp/$ARTIFACT_NAME
 
 ## Fix
 cd / ; patch -p0 < /tmp/$ARTIFACT_NAME ; rm /tmp/$ARTIFACT_NAME
+
+cd /sys/pdpstand
+make clean
+make
+cp boot /boot
+
+# Rebuild and install kernel
+sh ./updates/kernel.sh
