@@ -13,3 +13,18 @@ wc -l /tmp/$PATCH.artifact | \
 mv /tmp/$PATCH.artifact /tmp/$ARTIFACT_NAME
 
 ## Fix
+cd / ; patch -p0 < /tmp/$ARTIFACT_NAME ; rm /tmp/$ARTIFACT_NAME
+
+cd /usr/src/lib/ccom
+make
+make install
+make clean
+
+cd /usr/src/games/trek
+make
+make install
+make clean
+
+cd /usr/src/ucb
+make sccs
+install -s -m 755 sccs /usr/ucb/sccs
