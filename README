@@ -4,4 +4,63 @@ Warning!!!
 Running this script may result in data lost.
 Backup everything, read carefully and ammend when needed.
 
-Tested on PIDP11 2.11BSD released image on top of Simh
+Last updates tested on PIDP11 2.11BSD released image on top of Simh
+
+Early updates tested on top of 2.11BSD-pl195.tar
+
+This tourist install notes may help to create the 195 disk image:
+
+  * Create tape
+
+    ./mksimtape bootstrap:512 disklabel.bin:1024 mkfs.bin:1024 \
+    restor.bin:1024 icheck.bin:1024 root.dmp:10240 usr.tar:10240 \
+    sys.tar:10240 src.tar:10240 > 195.tape
+
+
+  * Configure simh
+
+   ;;; simh.ini
+   SET CPU 11/93, 4M
+   SET CPU IDLE
+   
+   SET RP  ENABLE
+   SET RP0 ENABLE, RP06, WRITEENABLED
+   ATTACH RP0 ./2.11BSD
+   
+   SET TS ENABLE
+   SET TS0 CAPAC=0,LOCKED
+   ATTACH TS0 ./195.tape
+   
+   SET DLI ENABLE
+   SET DLI LINES=2
+   ATTACH DLI 10001
+   SET DLO0 NODATASET,7B
+   SHOW DLO0
+   
+   BOOT TS0
+   ;;; end simh.ini
+
+  * Use disklabel ts(0,1) to create partitions
+     Tool introduced at Patch Level 250 (TODO: more info)
+  * Use mkfs ts(0,2) to create filesystems
+     Newer versions of mkfs will not work
+  * Use restor ts(0,3) to root.dmp ts(0,5) to disk xp(0,0)
+  * Write sector code (/mdec/dvhpuboot). I've used a recent version due to dd
+    problems (TODO: more info)
+  * Boot unix from disk. Setup /etc/fstab
+  * Restore /usr files
+      cd /usr
+        mt rew ; mt fsf 6 ; tar xvpbf 20 /dev/rmt12
+      mkdir /usr/src ; cd /usr/src
+        mt rew ; mt fsf 7 ; tar xvpbf 20 /dev/rmt12
+        mt rew ; mt fsf 8 ; tar xvpbf 20 /dev/rmt12
+  * Backup your disk image
+      Mine is here (until: 2020-03-16):
+        https://ufile.io/f48cagcn
+  * Setup the Updater:
+      Download patches (or setup network on 2.11 for FTP usage)
+      Use maketape.sh to generate a new tape. Setup simh and reboot
+      cd /home/user
+        mt rew ; tar xvpbf 20 /dev/rmt12
+  * Destroy your system: sh updater.sh
+  * Submit your updates/ scripts!
