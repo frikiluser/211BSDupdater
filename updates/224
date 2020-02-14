@@ -5,17 +5,11 @@ ARTIFACT_LINES=539
 ARTIFACT_NAME=$PATCH
 
 ## Verify artifact
-wc -l /tmp/$PATCH.artifact | \
-    grep -c "\ $ARTIFACT_LINES\ /tmp/" || \
-    exit 1
+./updates/verify.sh $PATCH $ARTIFACT_LINES || exit 1
 
 ## Rename artifact
 mv /tmp/$PATCH.artifact /tmp/$ARTIFACT_NAME
 
 ## Fix
-cd / ; patch -p0 < /tmp/$ARTIFACT_NAME ; rm /tmp/$ARTIFACT_NAME
-
-cd /usr/src/new/ntp
-make
-make install
-make clean
+./updates/patch.sh $ARTIFACT_NAME
+./updates/buildinstall.sh /usr/src/new/ntp

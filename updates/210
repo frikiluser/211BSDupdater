@@ -5,88 +5,36 @@ ARTIFACT_LINES=135
 ARTIFACT_NAME=$PATCH
 
 ## Verify artifact
-wc -l /tmp/$PATCH.artifact | \
-    grep -c "\ $ARTIFACT_LINES\ /tmp/" || \
-    exit 1
+./updates/verify.sh $PATCH $ARTIFACT_LINES || exit 1
 
 ## Rename artifact
 mv /tmp/$PATCH.artifact /tmp/$ARTIFACT_NAME
 
 ## Fix
-mv /VERSION /VERSION.old && cat /VERSION.old | sed 's@Current Patch Level: '`echo $PATCH-1|bc`'@Current Patch Level: 196@' > /VERSION
-cd / ; patch -p0 < /tmp/$ARTIFACT_NAME ; rm /tmp/$ARTIFACT_NAME
+./updates/endfakeversion.sh $PATCH
+./updates/patch.sh $ARTIFACT_NAME
 
 # 197 notes covers full pack 197-210
-cd /usr/src/usr.lib/libcurses
-make
-make install
-
-cd /usr/src/lib/libc
-make
-make install
+./updates/buildinstall.sh /usr/src/usr.lib/libcurses
+./updates/buildinstall.sh /usr/src/lib/libc
 
 cd /usr/src/usr.bin/lint
 ./libs
 
-cd /usr/src/bin/sh
-make 
-make install
-
-cd /usr/src/bin/csh
-make 
-make install
-
-cd /usr/src/bin/ls
-make
-make install
-
-cd /usr/src/bin/chflags
-make all
-make install
-
-cd /usr/src/bin
-make stty
-install -s -m 755 stty /bin/stty
-
-cd /usr/src/etc
-make pstat
-install -s -m 2755 -g kmem pstat /etc/pstat
-
-cd /usr/src/etc/getty
-make
-make install
-
-cd /usr/src/ucb/ex
-make
-make install
-
-cd /usr/src/ucb/tset
-make all
-make install
-
-cd /usr/src/usr.bin
-make tabs
-install -m 755 tabs /usr/bin/tabs
-
-cd /usr/src
-make clean
-
-cd /usr/src/man/man2
-make chflags.0 fcntl.0 open.0
-install -m 444 chflags.0 fcntl.0 open.0 /usr/man/cat2
-ln /usr/man/cat2/chflags.0 /usr/man/cat2/fchflags.0
-
-cd /usr/src/man/man1
-make ls.0
-install -m 444 ls.0 /usr/man/cat1/ls.0
-
-cd /usr/src/man/man4
-make tty.0
-install -m 444 tty.0 /usr/man/cat4/tty.0
-
-cd /usr/src/man/man8
-make dump.0
-install -m 444 dump.0 /usr/man/cat8/dump.0
+./updates/buildinstall.sh /usr/src/bin/sh
+./updates/buildinstall.sh /usr/src/bin/csh
+./updates/buildinstall.sh /usr/src/bin/ls
+./updates/buildinstall.sh /usr/src/bin/chflags
+./updates/buildinstall.sh /usr/src/bin
+./updates/buildinstall.sh /usr/src/etc
+./updates/buildinstall.sh /usr/src/etc/getty
+./updates/buildinstall.sh /usr/src/ucb/ex
+./updates/buildinstall.sh /usr/src/ucb/tset
+./updates/buildinstall.sh /usr/src/usr.bin
+./updates/buildinstall.sh /usr/src/man/man2
+./updates/buildinstall.sh /usr/src/man/man1
+./updates/buildinstall.sh /usr/src/man/man4
+./updates/buildinstall.sh /usr/src/man/man8
 
 # Rebuild and install kernel
 sh ./kernel.sh

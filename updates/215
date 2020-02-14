@@ -5,9 +5,7 @@ ARTIFACT_LINES=178
 ARTIFACT_NAME=$PATCH
 
 ## Verify artifact
-wc -l /tmp/$PATCH.artifact | \
-    grep -c "\ $ARTIFACT_LINES\ /tmp/" || \
-    exit 1
+./updates/verify.sh $PATCH $ARTIFACT_LINES || exit 1
 
 ## Rename artifact
 mv /tmp/$PATCH.artifact /tmp/$ARTIFACT_NAME
@@ -17,4 +15,4 @@ rm -f /usr/src/man/man1/ar.1
 rm -f /usr/src/man/man1/ranlib.1
 rm -f /usr/src/man/man5/ar.5
 
-cd / ; patch -p0 < /tmp/$ARTIFACT_NAME ; rm /tmp/$ARTIFACT_NAME
+./updates/patch.sh $ARTIFACT_NAME

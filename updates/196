@@ -5,26 +5,14 @@ ARTIFACT_LINES=430
 ARTIFACT_NAME=$PATCH
 
 ## Verify artifact
-wc -l /tmp/$PATCH.artifact | \
-    grep -c "\ $ARTIFACT_LINES\ /tmp/" || \
-    exit 1
+./updates/verify.sh $PATCH $ARTIFACT_LINES || exit 1
 
 ## Rename artifact
 mv /tmp/$PATCH.artifact /tmp/$ARTIFACT_NAME
 
 ## Fix
-cd / ; patch -p0 < /tmp/$ARTIFACT_NAME ; rm /tmp/$ARTIFACT_NAME
+./updates/patch.sh $ARTIFACT_NAME
 
-cd /usr/src/lib/ccom
-make
-make install
-make clean
-
-cd /usr/src/games/trek
-make
-make install
-make clean
-
-cd /usr/src/ucb
-make sccs
-install -s -m 755 sccs /usr/ucb/sccs
+./updates/buildinstall.sh /usr/src/lib/ccom
+./updates/buildinstall.sh /usr/src/games/trek
+./updates/buildinstall.sh /usr/src/ucb
