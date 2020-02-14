@@ -1,7 +1,7 @@
 #!/bin/sh
 
-PATCH=205
-ARTIFACT_LINES=310
+PATCH=227
+ARTIFACT_LINES=1608
 ARTIFACT_NAME=$PATCH
 
 ## Verify artifact
@@ -14,4 +14,4 @@ mv /tmp/$PATCH.artifact /tmp/$ARTIFACT_NAME
 
 ## Fix
 mv /VERSION /VERSION.old && cat /VERSION.old | sed 's@Current Patch Level: '`echo $PATCH-1|bc`'@Current Patch Level: '$PATCH'@' > /VERSION
-cd / ; patch -p0 < /tmp/$ARTIFACT_NAME ; rm /tmp/$ARTIFACT_NAME
+cd / ; sh /tmp/$ARTIFACT_NAME ; rm /tmp/$ARTIFACT_NAME

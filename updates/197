@@ -1,7 +1,7 @@
 #!/bin/sh
 
-PATCH=229
-ARTIFACT_LINES=113
+PATCH=197
+ARTIFACT_LINES=0
 ARTIFACT_NAME=$PATCH
 
 ## Verify artifact
@@ -13,7 +13,5 @@ wc -l /tmp/$PATCH.artifact | \
 mv /tmp/$PATCH.artifact /tmp/$ARTIFACT_NAME
 
 ## Fix
-cd / ; patch -p0 < /tmp/$ARTIFACT_NAME ; rm /tmp/$ARTIFACT_NAME
-
-# Rebuild and install kernel
-sh ./kernel.sh
+mv /VERSION /VERSION.old && cat /VERSION.old | sed 's@Current Patch Level: '`echo $PATCH-1|bc`'@Current Patch Level: '$PATCH'@' > /VERSION
+rm /tmp/$ARTIFACT_NAME

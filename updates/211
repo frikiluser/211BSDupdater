@@ -14,3 +14,7 @@ mv /tmp/$PATCH.artifact /tmp/$ARTIFACT_NAME
 
 ## Fix
 cd / ; patch -p0 < /tmp/$ARTIFACT_NAME ; rm /tmp/$ARTIFACT_NAME
+
+cd /usr/src/bin
+make ps
+install -s -m 2755 -g kmem ps /bin/ps
