@@ -2,7 +2,7 @@
 
 PATCH=$1
 
-if [ ! -e ./patches/$PATCH ]
+if [ ! -r ./patches/$PATCH ]
 then
     ## Setup
     touch /.netrc
