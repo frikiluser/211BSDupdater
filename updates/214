@@ -1,0 +1,25 @@
+#!/bin/sh
+
+PATCH=214
+ARTIFACT_LINES=281
+ARTIFACT_NAME=$PATCH
+
+## Verify artifact
+wc -l /tmp/$PATCH.artifact | \
+    grep -c "\ $ARTIFACT_LINES\ /tmp/" || \
+    exit 1
+
+## Rename artifact
+mv /tmp/$PATCH.artifact /tmp/$ARTIFACT_NAME
+
+## Fix
+sh /tmp/$ARTIFACT_NAME ; rm /tmp/$ARTIFACT_NAME
+sh /tmp/rm.sh.$PATCH
+patch -p0 < /tmp/patch.$PATCH.1 # update /VERSION
+patch -p0 < /tmp/patch.$PATCH.2 # update the uucp.h file
+
+cd /usr/src/usr.bin/uucp
+cp /tmp/Makefile.$PATCH Makefile
+make 
+make install
+make clean

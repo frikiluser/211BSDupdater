@@ -1,0 +1,59 @@
+#!/bin/sh
+
+PATCH=431
+ARTIFACT_LINES=2448
+ARTIFACT_NAME=$PATCH
+
+## Verify artifact
+wc -l /tmp/$PATCH.artifact | \
+    grep -c "\ $ARTIFACT_LINES\ /tmp/" || \
+    exit 1
+
+## Rename artifact
+mv /tmp/$PATCH.artifact /tmp/$ARTIFACT_NAME
+
+## Fix
+cd /tmp
+sh $ARTIFACT_NAME
+sh $PATCH.shar
+patch -p0 < $PATCH.patch
+
+cd /usr/src/bin/as
+make
+make install
+make clean
+
+cd /usr/src/bin/make
+make
+make install
+make clean
+
+cd /usr/src/lib/libc
+make clean
+make
+make install
+make clean
+
+cd /usr/src/usr.bin/dc
+make 
+make install
+make clean
+
+cd /usr/src/usr.bin/lint
+./libs
+
+cd /usr/src/bin/adb
+make
+make install
+make clean
+
+cd /usr/src/man/man2
+/usr/man/manroff select.2 > /usr/man/cat2/select.0
+
+cd /sys/pdpstand
+make clean
+make
+cp toyset /toyset
+
+# Rebuild and install kernel
+sh ./updates/kernel.sh

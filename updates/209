@@ -1,0 +1,17 @@
+#!/bin/sh
+
+PATCH=209
+ARTIFACT_LINES=492
+ARTIFACT_NAME=$PATCH
+
+## Verify artifact
+wc -l /tmp/$PATCH.artifact | \
+    grep -c "\ $ARTIFACT_LINES\ /tmp/" || \
+    exit 1
+
+## Rename artifact
+mv /tmp/$PATCH.artifact /tmp/$ARTIFACT_NAME
+
+## Fix
+mv /VERSION /VERSION.old && cat /VERSION.old | sed 's@Current Patch Level: '`echo $PATCH-1|bc`'@Current Patch Level: '$PATCH'@' > /VERSION
+cd / ; patch -p0 < /tmp/$ARTIFACT_NAME ; rm /tmp/$ARTIFACT_NAME

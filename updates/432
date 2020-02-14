@@ -1,0 +1,38 @@
+#!/bin/sh
+
+PATCH=432
+ARTIFACT_LINES=1267
+ARTIFACT_NAME=$PATCH
+
+## Verify artifact
+wc -l /tmp/$PATCH.artifact | \
+    grep -c "\ $ARTIFACT_LINES\ /tmp/" || \
+    exit 1
+
+## Rename artifact
+mv /tmp/$PATCH.artifact /tmp/$ARTIFACT_NAME
+
+## Fix
+cd /tmp
+sh $ARTIFACT_NAME
+./$PATCH.sh
+./$PATCH.rm
+sh $PATCH.shar
+patch -p0 < $PATCH.patch
+
+cd /usr/src/new/kermit5.188
+make bsd211
+cp wermit /usr/new/kermit
+make clean
+
+cd /usr/src/share/me
+make install
+cd /usr/src/share/tmac
+make install
+
+cd /sys/mdec
+install -m 444 rauboot /mdec/rauboot
+make clean
+
+# Rebuild and install kernel
+sh ./updates/kernel.sh

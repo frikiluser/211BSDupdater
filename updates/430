@@ -1,0 +1,26 @@
+#!/bin/sh
+
+PATCH=430
+ARTIFACT_LINES=1325
+ARTIFACT_NAME=$PATCH
+
+## Verify artifact
+wc -l /tmp/$PATCH.artifact | \
+    grep -c "\ $ARTIFACT_LINES\ /tmp/" || \
+    exit 1
+
+## Rename artifact
+mv /tmp/$PATCH.artifact /tmp/$ARTIFACT_NAME
+
+## Fix
+cd /
+patch -p0 < /tmp/$ARTIFACT_NAME
+mount -u -o noaccesstime /usr
+cd /usr/src
+make clean
+
+make build >& /usr/tmp/log
+make installsrc
+
+cd /usr/src
+make clean

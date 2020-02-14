@@ -1,0 +1,36 @@
+#!/bin/sh
+
+PATCH=439
+ARTIFACT_LINES=601
+ARTIFACT_NAME=$PATCH
+
+## Verify artifact
+wc -l /tmp/$PATCH.artifact | \
+    grep -c "\ $ARTIFACT_LINES\ /tmp/" || \
+    exit 1
+
+## Rename artifact
+mv /tmp/$PATCH.artifact /tmp/$ARTIFACT_NAME
+
+## Fix
+cd / ; patch -p0 < /tmp/$ARTIFACT_NAME ; rm /tmp/$ARTIFACT_NAME
+
+cd /usr/src/lib/cpp
+make
+make install
+make clean
+
+cd /usr/src/share/tmac
+make install
+
+cd /usr/src/bin/ld
+make ld.0
+install -c -o bin -g bin -m 444 ld.0 /usr/man/cat1
+
+cd /sys/pdpstand
+make clean
+make 
+cp boot disklabel toyset /
+
+# Rebuild and install kernel
+sh ./updates/kernel.sh
